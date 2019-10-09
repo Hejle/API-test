@@ -17,6 +17,12 @@ namespace API_test.Controllers
         [ActionName("Print")]
         public string PostPrint([FromBody]string value)
         {
+            Receipt receipt = new Receipt();
+
+            receipt.getProducts();
+
+            //reciept
+            //printer.PrintText(Receipt);
             printer.PrintText(value); 
             return "Success";
         }
