@@ -31,6 +31,7 @@ namespace API_test.Models
             boughtProducts.Add(productLine2);
             boughtProducts.Add(productLine3);
 
+            
             return boughtProducts;
         }
 
