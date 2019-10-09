@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Printing;
-using System.Web;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Documents;
-using System.Drawing;
+﻿using System.Printing;
+using System;
 using System.IO;
+using System.Drawing;
 using System.Drawing.Printing;
+using System.Windows.Forms;
 
 namespace API_test.Models
 {
@@ -16,65 +11,55 @@ namespace API_test.Models
     {
         
         public string printerName { get; set; }
+        private Font printFont = new Font("Times New Roman", 12, FontStyle.Regular, GraphicsUnit.Millimeter));
         private StreamReader streamToPrint;
-        private Font printFont;
 
 
         public void PrintText(string text)
         {
+            
+            PrintDocument p = new PrintDocument();
+            p.DefaultPageSettings.PaperSize = new PaperSize("210 x 297 mm", 300, 300);
+            p.DefaultPageSettings.Margins.Left = 50;
+            float leftMargin = p.DefaultPageSettings.Margins.Left;
+            float topMargin = p.DefaultPageSettings.Margins.Top;
+            float productLength = 200;
+            float margin = 20;
+            string[] a = { "Mælk", "Ost", "Æbler", "FladPandeÆblekugleFormerMaskineSkrællerDimsedut"};
+            string[] priser = {"7.95", "35.50", "2.00", "99,95"};
+            Graphics g = p.PrinterSettings.CreateMeasurementGraphics();
 
-           /* try
+            p.PrintPage += delegate (object sender1, PrintPageEventArgs e1)
             {
-                streamToPrint = new StreamReader("C:\\My Documents\\MyFile.txt");
-                try
+                for (int i = 0; i < a.Length; i++)
                 {
-                    printFont = new Font("Arial", 10);
-                    PrintDocument pd = new PrintDocument();
-                    pd.
-                    pd.PrintPage += new PrintPageEventHandler(this.pd_PrintPage(, thtext));
-                    pd.Print();
+                     
+                    var ypos = topMargin + (i * printFont.Height);
+                    e1.Graphics.DrawString(a[i], printFont, new SolidBrush(Color.Black), leftMargin, ypos);
+
+                    e1.Graphics.DrawString(priser[i], printFont, new SolidBrush(Color.Black), leftMargin + productLength + margin, ypos);
                 }
-                finally
+
+                /*
+                foreach (string element in a)
                 {
-                    streamToPrint.Close();
-                }
+                    e1.Graphics.DrawString(element, printFont, new SolidBrush(Color.Black),
+                    new RectangleF(0, 0, p.DefaultPageSettings.PrintableArea.Width, p.DefaultPageSettings.PrintableArea.Height));
+                }*/
+
+            };
+
+
+            try
+            {
+                p.Print();
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
-            } */
-        }
-
-        /*private void pd_PrintPage(object sender, string text)
-        {
-            float linesPerPage = 0;
-            float yPos = 0;
-            int count = 0;
-            float leftMargin = ev.MarginBounds.Left;
-            float topMargin = ev.MarginBounds.Top;
-            string line = null;
-
-            // Calculate the number of lines per page.
-            linesPerPage = ev.MarginBounds.Height /
-               printFont.GetHeight(ev.Graphics);
-
-            // Print each line of the file.
-            while (count < linesPerPage &&
-               ((line = streamToPrint.ReadLine()) != null))
-            {
-                yPos = topMargin + (count *
-                   printFont.GetHeight(ev.Graphics));
-                ev.Graphics.DrawString(line, printFont, Brushes.Black,
-                   leftMargin, yPos, new StringFormat());
-                count++;
+                //throw new Exception("Exception Occured While Printing", ex);
             }
-
-            // If more lines exist, print another page.
-            if (line != null)
-                ev.HasMorePages = true;
-            else
-                ev.HasMorePages = false;
-        } */
+        }
 
 
 
