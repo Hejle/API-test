@@ -60,15 +60,24 @@ namespace API_test.Controllers
         [Route("api/Receipt/Add"), HttpPost]
            public async Task<string> PostRawBufferManual()
         {
+
             string result = await Request.Content.ReadAsStringAsync();
 
             var convertedResult = JsonConvert.DeserializeObject<RootObject>(result);
 
+            var listOfProducts = convertedResult.Products.Select(p => new Product(p.EAN, p.PRODUCT,p.PRICE) ).ToList();
+
+
+
             Receipt receipt = new Receipt();
 
+            foreach (Product produkt in listOfProducts)
+            {
+                receipt.AddProductLine(new ProductLine(produkt, 1));
 
+            }
 
-            return result;
+            return "Products printed!";
         }
 
 

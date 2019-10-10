@@ -33,8 +33,8 @@ namespace API_test.Models
                 for (var i = 0; i < list.Count; i++)
                 {
                     var productLine = receipt.getProducts()[i];
-                    var price = productLine.Product.Price * productLine.Quantity;
-                    var productText = productLine.Product.ProductName;
+                    var price = productLine.Product.PRICE * productLine.Quantity;
+                    var productText = productLine.Product.PRODUCT;
                     var m1 = g.MeasureString(productText, printFont);
 
                     string truncatedProductText = TruncateText(productText, printFont, productLength, false, g);
