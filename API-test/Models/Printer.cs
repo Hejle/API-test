@@ -16,8 +16,8 @@ namespace API_test.Models
     {
         
         public string printerName { get; set; }
-        private StreamReader streamToPrint;
-        private Font printFont;
+     //   private StreamReader streamToPrint;
+     //   private Font printFont;
 
 
         public void PrintText(string text)
