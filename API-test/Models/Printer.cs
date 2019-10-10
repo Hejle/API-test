@@ -25,19 +25,19 @@ namespace API_test.Models
             float topMargin = p.DefaultPageSettings.Margins.Top;
             float productLength = 250;
             float margin = 20;
-            string[] a = { "Mælk", "Ost", "Æbler", "FladPandeÆblekugleFormerMaskineSkrællerDimsedut"};
-            string[] priser = {"7.95", "35.50", "2.00", "99,95"};
             Graphics g = p.PrinterSettings.CreateMeasurementGraphics();
             var list = receipt.getProducts();
             p.PrintPage += delegate (object sender1, PrintPageEventArgs e1)
             {
                 for (int i = 0; i < list.Count; i++)
                 {
-                    var price = list[i].Product.Price * receipt.getProducts()[i].Quantity;
-                    var productText = list[i].Product.ProductName;
+                    var productLine = receipt.getProducts()[i];
+                    var price = productLine.Product.Price * productLine.Quantity;
+                    var productText = productLine.Product.ProductName;
+
                     string truncatedProductText = TruncateText(productText, printFont, productLength, false, g);
                     var ypos = topMargin + (i * printFont.Height);
-                    e1.Graphics.DrawString(productText, printFont, new SolidBrush(Color.Black), leftMargin, ypos);
+                    e1.Graphics.DrawString(truncatedProductText, printFont, new SolidBrush(Color.Black), leftMargin, ypos);
 
                     e1.Graphics.DrawString(String.Format("{0:0.00}", price), printFont, new SolidBrush(Color.Black), leftMargin + productLength + margin, ypos);
                 }
