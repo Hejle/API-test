@@ -11,7 +11,7 @@ namespace API_test.Models
     {
         
         public string printerName { get; set; }
-        private Font printFont = new Font("Times New Roman", 12, FontStyle.Regular, GraphicsUnit.Millimeter);
+        private Font printFont = new Font("Times New Roman", 20f, FontStyle.Regular, GraphicsUnit.World);
         private StreamReader streamToPrint;
 
 
@@ -19,23 +19,27 @@ namespace API_test.Models
         {
             
             PrintDocument p = new PrintDocument();
-            p.DefaultPageSettings.PaperSize = new PaperSize("210 x 297 mm", 800, 800);
-            p.DefaultPageSettings.Margins.Left = 50;
+            p.DefaultPageSettings.PaperSize = new PaperSize("210 x 297 mm", MMToHP(80), MMToHP(80));
+            p.DefaultPageSettings.Margins.Left = 0;
+            p.DefaultPageSettings.Margins.Right = 0;
             float leftMargin = p.DefaultPageSettings.Margins.Left;
             float topMargin = p.DefaultPageSettings.Margins.Top;
-            float productLength = 250;
-            float margin = 20;
-            Graphics g = p.PrinterSettings.CreateMeasurementGraphics();
+            float productLength = 560;
+            float margin = 10;
+            var g = p.PrinterSettings.CreateMeasurementGraphics();
             var list = receipt.getProducts();
             p.PrintPage += delegate (object sender1, PrintPageEventArgs e1)
             {
-                for (int i = 0; i < list.Count; i++)
+                for (var i = 0; i < list.Count; i++)
                 {
                     var productLine = receipt.getProducts()[i];
                     var price = productLine.Product.Price * productLine.Quantity;
                     var productText = productLine.Product.ProductName;
+                    var m1 = g.MeasureString(productText, printFont);
 
                     string truncatedProductText = TruncateText(productText, printFont, productLength, false, g);
+                    var m2 = g.MeasureString(truncatedProductText, printFont);
+
                     var ypos = topMargin + (i * printFont.Height);
                     e1.Graphics.DrawString(truncatedProductText, printFont, new SolidBrush(Color.Black), leftMargin, ypos);
 
@@ -56,6 +60,15 @@ namespace API_test.Models
             }
         }
 
+        //Gets hundreths of inch from milimeters
+        private int MMToHP(int pMM)
+        {
+            return Convert.ToInt32(pMM * 100 / 25.4);
+        }
+
+        
+
+
 
         /// <summary>
         /// Truncates the string to be smaller than the desired width.
@@ -65,6 +78,8 @@ namespace API_test.Models
         /// <param name="direction">The direction of the truncation. True for left (…ext), False for right(Tex…).</param>
         private string TruncateText(string text, Font font, float width, bool direction, Graphics g)
         {
+            var mult = width % 50;
+            var offset = mult * 3;
             string truncatedText, returnText;
             int charIndex = 0;
             bool truncated = false;
@@ -75,11 +90,16 @@ namespace API_test.Models
             //At this point, the direction is not important so we place ellipsis behind the text.
             truncatedText = text + "…";
 
+            if(width > g.MeasureString(text, font).Width)
+            {
+                return text;
+            }
+
             //Get the size of the string in milimeters.
             SizeF size = g.MeasureString(truncatedText, font);
 
             //Do while the string is bigger than the desired width.
-            while (size.Width > width)
+            while (size.Width > width + offset)
             {
                 //Go to next char
                 charIndex++;
